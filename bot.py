@@ -29,7 +29,7 @@ TASK_FIELDS = [
 
 STATUS_MAP = {
     'take': 'готов взять задачу',
-    'no_competence': 'не имеет компетенций',
+    'no_competence': 'не уверен, нужны уточнения',
     'cant_take': 'не может взять задачу'
 }
 
@@ -120,7 +120,7 @@ def send_unanswered_notification(task_number):
     
     if unanswered_users:
         message = (
-            f"@nnthruslpn\n"
+            f"@aagutenev\n"
             f"Следующие специалисты не дали ответ на задачу #{task_number} в течение 2 минут:\n"
             f"{', '.join(unanswered_users)}"
         )
@@ -138,7 +138,7 @@ def create_keyboard(buttons, row_width=1):
 def main_task_keyboard(task_number):
     return create_keyboard([
         [("Беру задачу", f"user_take:{task_number}")],
-        [("Не имею компетенции", f"user_no_competence:{task_number}")],
+        [("Не уверен, нужны уточнения", f"user_no_competence:{task_number}")],
         [("Не могу взять", f"user_cant_take:{task_number}")]
     ])
 
@@ -325,14 +325,14 @@ def finalize_task(chat_id, task_data):
             scheduler.add_job(
                 send_reminder_to_user,
                 'date',
-                run_date=datetime.now() + timedelta(minutes=1),
+                run_date=datetime.now() + timedelta(minutes=30),
                 args=[task_number, receiver_id]
             )
         
         scheduler.add_job(
             send_unanswered_notification,
             'date',
-            run_date=datetime.now() + timedelta(minutes=2),
+            run_date=datetime.now() + timedelta(minutes=60),
             args=[task_number]
         )
         
