@@ -50,25 +50,41 @@ class TaskManager:
         self._load_state()
 
     def _load_state(self):
-        try:
-            with open('task_state.json', 'r') as f:
-                data = json.load(f)
-                self.task_counter = data.get('task_counter', 1)
-        except FileNotFoundError:
-            self.task_counter = 1
-        except Exception as e:
-            logger.error(f"Error loading state: {e}")
-            self.task_counter = 1
+       try:
+           with open('task_state.json', 'r') as f:
+              data = json.load(f)
+              self.task_counter = data.get('task_counter', 1)
+              self.tasks = data.get('tasks', {})
+              self.threads = data.get('threads', {})
+              self.message_ids = data.get('message_ids', {})
+              self.pending_tasks = data.get('pending_tasks', {})
+       except FileNotFoundError:
+        self.task_counter = 1
+        self.tasks = {}
+        self.threads = {}
+        self.message_ids = {}
+        self.pending_tasks = {}
+       except Exception as e:
+        logger.error(f"Error loading state: {e}")
+        self.task_counter = 1
+        self.tasks = {}
+        self.threads = {}
+        self.message_ids = {}
+        self.pending_tasks = {}
 
     def save_state(self):
-        data = {
-            'task_counter': self.task_counter
-        }
-        try:
-            with open('task_state.json', 'w') as f:
-                json.dump(data, f)
-        except Exception as e:
-            logger.error(f"Error saving state: {e}")
+      data = {
+         'task_counter': self.task_counter,
+         'tasks': self.tasks,
+         'threads': self.threads,
+         'message_ids': self.message_ids,
+         'pending_tasks': self.pending_tasks
+       }
+      try:
+          with open('task_state.json', 'w') as f:
+              json.dump(data, f, indent=4)
+      except Exception as e:
+        logger.error(f"Error saving state: {e}")
 
     def create_task(self, chat_id):
         self.pending_tasks[chat_id] = {field: None for field, _ in TASK_FIELDS}
@@ -260,8 +276,18 @@ def process_task_data(message):
     else:
         finalize_task(chat_id, task_data)
 
-def finalize_task(chat_id, task_data):
-    task_number = task_manager.task_counter
+def finalize_task(self, chat_id, task_data):
+    task_number = self.task_counter
+    task_data.update({
+        'sender_name': "Sender Name",  # Замените на реальное имя
+        'status': {},
+        'responded_users': [],
+        'is_resolved': False,
+        'sender_id': chat_id
+    })
+    self.tasks[task_number] = task_data
+    self.task_counter += 1
+    self.save_state()  # Сохраняем состояние после изменения
     
     try:
         user = bot.get_chat(chat_id)
@@ -452,6 +478,7 @@ def handle_user_response(call, action, task_number):
 
 if __name__ == '__main__':
     logger.info("Starting bot...")
+    task_manager = TaskManager()  # Инициализация менеджера задач
     try:
         bot.polling(none_stop=True)
     except KeyboardInterrupt:
