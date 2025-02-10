@@ -3,7 +3,11 @@ import logging
 from datetime import datetime, timedelta
 from telebot import TeleBot, types
 from apscheduler.schedulers.background import BackgroundScheduler
-from config import TOKEN, SENDER_USER_IDS, RECEIVER_USER_IDS, INFO_CHAT_ID
+from config import SENDER_USER_IDS, RECEIVER_USER_IDS, INFO_CHAT_ID
+import os
+from dotenv import load_dotenv
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
 
 logging.basicConfig(
     level=logging.INFO,

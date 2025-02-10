@@ -1,7 +1,7 @@
 # config.py1307828669
 
 # Bot token (сохраняйте в секрете!)
-TOKEN = '8171295545:AAET2IlRHgsU3lijKimlDiBdBzOzuG0amnQ'
+
 
 # User IDs
 SENDER_USER_IDS = [439829284,868351136,775886747,717772330]
