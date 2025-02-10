@@ -125,7 +125,7 @@ def send_unanswered_notification(task_number):
     if unanswered_users:
         message = (
             f"@aagutenev\n"
-            f"Следующие специалисты не дали ответ на задачу #{task_number} в течение 2 минут:\n"
+            f"Следующие специалисты не дали ответ на задачу #{task_number} в течение часа:\n"
             f"{', '.join(unanswered_users)}"
         )
         bot.send_message(INFO_CHAT_ID, message)
